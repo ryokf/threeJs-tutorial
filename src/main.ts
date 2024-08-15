@@ -5,6 +5,7 @@ import Stats from "three/examples/jsm/libs/stats.module.js";
 import { GUI } from "dat.gui";
 
 const scene = new THREE.Scene();
+scene.add(new THREE.GridHelper)
 
 const sceneBg = {
   color: 0x222222,
@@ -25,7 +26,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 5;
+camera.position.set(0, 2, 4); // x, y, z = 5;
+camera.lookAt(0, 1, 0)
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -34,10 +36,11 @@ document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshNormalMaterial({ wireframe: true });
 const cube = new THREE.Mesh(geometry, material);
+cube.position.y = 0.5
 scene.add(cube);
 
 // orbit control
-new OrbitControls(camera, renderer.domElement);
+// new OrbitControls(camera, renderer.domElement);
 
 // stats
 const stats = new Stats();
@@ -50,14 +53,24 @@ const cubeFolder = gui.addFolder("Cube");
 cubeFolder.add(cube.rotation, "x", 0, Math.PI * 2);
 cubeFolder.add(cube.rotation, "y", 0, Math.PI * 2);
 cubeFolder.add(cube.rotation, "z", 0, Math.PI * 2);
-cubeFolder.open();
+// cubeFolder.open();
 
-const cameraFolder = gui.addFolder("Camera");
-cameraFolder.add(camera.position, "z", 0, 20);
+const cameraFolder = gui.addFolder("Camera position");
+cameraFolder.add(camera.position, "x", -10, 10);
+cameraFolder.add(camera.position, "y", -10, 10);
+cameraFolder.add(camera.position, "z", -10, 10);
 cameraFolder.open();
 
+const cameraRotationFolder = gui.addFolder("Camera rotation");
+cameraRotationFolder.add(camera.rotation, "x", -10, 10);
+cameraRotationFolder.add(camera.rotation, "y", -10, 10);
+cameraRotationFolder.add(camera.rotation, "z", -10, 10);
+cameraRotationFolder.open();
+
+// cameraFolder.add(camera.rotation, "x", -10, 10);
 function animate() {
-  cube.rotation.y += 0.01;
+  // cube.rotation.y += 0.01;
+  camera.lookAt(0, 1, 0)
   renderer.render(scene, camera);
 
   stats.update();
