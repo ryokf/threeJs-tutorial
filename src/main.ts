@@ -5,7 +5,7 @@ import Stats from "three/examples/jsm/libs/stats.module.js";
 import { GUI } from "dat.gui";
 
 const scene = new THREE.Scene();
-scene.add(new THREE.GridHelper)
+scene.add(new THREE.GridHelper());
 
 const sceneBg = {
   color: 0x222222,
@@ -27,16 +27,16 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 camera.position.set(0, 2, 4); // x, y, z = 5;
-camera.lookAt(0, 1, 0)
+camera.lookAt(0, 1, 0);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshNormalMaterial({ wireframe: true });
 const cube = new THREE.Mesh(geometry, material);
-cube.position.y = 0.5
+cube.position.y = 0.5;
 scene.add(cube);
 
 // orbit control
@@ -67,10 +67,9 @@ cameraRotationFolder.add(camera.rotation, "y", -10, 10);
 cameraRotationFolder.add(camera.rotation, "z", -10, 10);
 cameraRotationFolder.open();
 
-// cameraFolder.add(camera.rotation, "x", -10, 10);
 function animate() {
   // cube.rotation.y += 0.01;
-  camera.lookAt(0, 1, 0)
+  camera.lookAt(0, 1, 0);
   renderer.render(scene, camera);
 
   stats.update();
