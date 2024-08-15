@@ -67,7 +67,14 @@ cameraRotationFolder.add(camera.rotation, "y", -10, 10);
 cameraRotationFolder.add(camera.rotation, "z", -10, 10);
 cameraRotationFolder.open();
 
+const clock = new THREE.Clock();
+let delta: number
+
 function animate() {
+  delta = clock.getDelta()
+  console.log(delta)
+  cube.rotation.y += delta
+
   // cube.rotation.y += 0.01;
   camera.lookAt(0, 1, 0);
   renderer.render(scene, camera);
