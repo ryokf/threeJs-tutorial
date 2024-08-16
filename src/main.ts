@@ -1,85 +1,106 @@
-import * as THREE from "three";
-import "./style.css";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
-import Stats from "three/examples/jsm/libs/stats.module.js";
-import { GUI } from "dat.gui";
+import './style.css'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import Stats from 'three/addons/libs/stats.module.js'
+import { GUI } from 'dat.gui'
 
-const scene = new THREE.Scene();
-scene.add(new THREE.GridHelper());
+const scene = new THREE.Scene()
+scene.add(new THREE.AxesHelper(5))
 
-const sceneBg = {
-  color: 0x222222,
-  image: "https://sbcode.net/img/grid.png",
-  skyBox: {
-    path: "https://sbcode.net/img/",
-    images: ["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"],
-  },
-};
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+camera.position.set(4, 4, 4)
 
-scene.background = new THREE.CubeTextureLoader()
-  .setPath(sceneBg.skyBox.path)
-  .load(sceneBg.skyBox.images);
+const renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth, window.innerHeight)
+document.body.appendChild(renderer.domElement)
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.set(0, 2, 4); // x, y, z = 5;
-camera.lookAt(0, 1, 0);
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.target.set(8, 0, 0)
+controls.update()
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const light = new THREE.PointLight(0xffffff, 400)
+light.position.set(1, 10, 10)
+scene.add(light)
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshNormalMaterial({ wireframe: true });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.y = 0.5;
-scene.add(cube);
+const object1 = new THREE.Mesh(new THREE.SphereGeometry(), new THREE.MeshPhongMaterial({ color: 0xff0000 }))
+object1.position.set(4, 0, 0)
+scene.add(object1)
+object1.add(new THREE.AxesHelper(5))
 
-// orbit control
-// new OrbitControls(camera, renderer.domElement);
+const object2 = new THREE.Mesh(new THREE.SphereGeometry(), new THREE.MeshPhongMaterial({ color: 0x00ff00 }))
+object2.position.set(4, 0, 0)
+object1.add(object2)
+object2.add(new THREE.AxesHelper(5))
 
-// stats
-const stats = new Stats();
-document.body.appendChild(stats.dom);
+const object3 = new THREE.Mesh(new THREE.SphereGeometry(), new THREE.MeshPhongMaterial({ color: 0x0000ff }))
+object3.position.set(4, 0, 0)
+object2.add(object3)
+object3.add(new THREE.AxesHelper(5))
 
-// dat gui
-const gui = new GUI();
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+})
 
-const cubeFolder = gui.addFolder("Cube");
-cubeFolder.add(cube.rotation, "x", 0, Math.PI * 2);
-cubeFolder.add(cube.rotation, "y", 0, Math.PI * 2);
-cubeFolder.add(cube.rotation, "z", 0, Math.PI * 2);
-// cubeFolder.open();
+const gui = new GUI()
+const object1Folder = gui.addFolder('Object1 (Red Ball)')
+object1Folder.add(object1.position, 'x', 0, 10, 0.01).name('X Position')
+object1Folder.add(object1.rotation, 'x', 0, Math.PI * 2, 0.01).name('X Rotation')
+object1Folder.add(object1.scale, 'x', 0, 2, 0.01).name('X Scale')
+object1Folder.open()
+const object2Folder = gui.addFolder('Object2 (Green Ball)')
+object2Folder.add(object2.position, 'x', 0, 10, 0.01).name('X Position')
+object2Folder.add(object2.rotation, 'x', 0, Math.PI * 2, 0.01).name('X Rotation')
+object2Folder.add(object2.scale, 'x', 0, 2, 0.01).name('X Scale')
+object2Folder.open()
+const object3Folder = gui.addFolder('Object3 (Blue Ball)')
+object3Folder.add(object3.position, 'x', 0, 10, 0.01).name('X Position')
+object3Folder.add(object3.rotation, 'x', 0, Math.PI * 2, 0.01).name('X Rotation')
+object3Folder.add(object3.scale, 'x', 0, 2, 0.01).name('X Scale')
+object3Folder.open()
 
-const cameraFolder = gui.addFolder("Camera position");
-cameraFolder.add(camera.position, "x", -10, 10);
-cameraFolder.add(camera.position, "y", -10, 10);
-cameraFolder.add(camera.position, "z", -10, 10);
-cameraFolder.open();
+const stats = new Stats()
+document.body.appendChild(stats.dom)
 
-const cameraRotationFolder = gui.addFolder("Camera rotation");
-cameraRotationFolder.add(camera.rotation, "x", -10, 10);
-cameraRotationFolder.add(camera.rotation, "y", -10, 10);
-cameraRotationFolder.add(camera.rotation, "z", -10, 10);
-cameraRotationFolder.open();
-
-const clock = new THREE.Clock();
-let delta: number
+const debug = document.getElementById('debug') as HTMLDivElement
 
 function animate() {
-  delta = clock.getDelta()
-  console.log(delta)
-  cube.rotation.y += delta
+    requestAnimationFrame(animate)
 
-  // cube.rotation.y += 0.01;
-  camera.lookAt(0, 1, 0);
-  renderer.render(scene, camera);
+    renderer.render(scene, camera)
 
-  stats.update();
+    const object1WorldPosition = new THREE.Vector3()
+    object1.getWorldPosition(object1WorldPosition)
+    const object2WorldPosition = new THREE.Vector3()
+    object2.getWorldPosition(object2WorldPosition)
+    const object3WorldPosition = new THREE.Vector3()
+    object3.getWorldPosition(object3WorldPosition)
+
+    debug.innerText =
+        'Red\n' +
+        'Local Pos X : ' +
+        object1.position.x.toFixed(2) +
+        '\n' +
+        'World Pos X : ' +
+        object1WorldPosition.x.toFixed(2) +
+        '\n' +
+        '\nGreen\n' +
+        'Local Pos X : ' +
+        object2.position.x.toFixed(2) +
+        '\n' +
+        'World Pos X : ' +
+        object2WorldPosition.x.toFixed(2) +
+        '\n' +
+        '\nBlue\n' +
+        'Local Pos X : ' +
+        object3.position.x.toFixed(2) +
+        '\n' +
+        'World Pos X : ' +
+        object3WorldPosition.x.toFixed(2) +
+        '\n'
+
+    stats.update()
 }
 
-renderer.setAnimationLoop(animate);
+animate()
